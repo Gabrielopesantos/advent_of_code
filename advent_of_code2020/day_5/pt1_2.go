@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"math"
+	"sort"
 	"strings"
 )
 
@@ -18,20 +19,21 @@ func (s Seat) calcSeatID() int {
 	return s.row*8 + s.col
 }
 
-func Find(slice []int, val int) bool {
-	for _, sval := range slice {
-		if val == sval {
-			return true
-		}
-	}
+// func Find(slice []int, val int) bool {
+// 	for _, sval := range slice {
+// 		if val == sval {
+// 			return true
+// 		}
+// 	}
 
-	return false
-}
+// 	return false
+// }
 
-func generateAllIds() []int {
+func generateFirstLastRowsIds() []int {
 	allIds := make([]int, 0)
+	rows := []int{0, 127}
 
-	for row := 0; row < 128; row++ {
+	for _, row := range rows {
 		for col := 0; col < 8; col++ {
 			allIds = append(allIds, row*8+col)
 		}
@@ -56,18 +58,18 @@ func bin_search(pos []string, chars []string, upperB float64) float64 {
 	for _, c := range chars {
 		switch c {
 		case pos[0]:
-			lowerB = (lowerB + upperB) / 2
+			lowerB = math.Round((lowerB + upperB) / 2)
 		case pos[1]:
-			upperB = (lowerB + upperB) / 2
+			upperB = math.Floor((lowerB + upperB) / 2)
 		default:
 			fmt.Println("\n", c, "?")
 		}
 	}
 
 	if chars[len(chars)-1] == pos[0] {
-		return math.Round(upperB)
+		return upperB
 	} else {
-		return math.Round(lowerB)
+		return lowerB
 	}
 }
 
@@ -94,28 +96,16 @@ func main() {
 	}
 	fmt.Println(getMax(seatIDS))
 
-	code_b := []string{"B", "F", "F", "F", "B", "B", "F", "R", "R", "R"}
-	// code_b := []string{"F", "F", "F", "B", "B", "B", "F", "R", "R", "R"}
-	s := Seat{row: int(bin_search(rows_pos, code_b[:7], 127)), col: int(bin_search(cols_pos, code_b[7:], 7))}
-	fmt.Println(s)
+	followsRule := make([]int, 0)
 
-	// allIds := generateAllIds()
-	// emptySeats := make([]int, 0)
+	sort.Ints(seatIDS)
+	for i, val := range seatIDS {
+		if i < len(seatIDS)-2 {
+			if seatIDS[i+1]-val == 2 {
+				followsRule = append(followsRule, val+1)
+			}
+		}
+	}
 
-	// for _, id := range allIds {
-	// 	if ok := Find(seatIDS, id); !ok {
-	// 		emptySeats = append(emptySeats, id)
-	// 	}
-	// }
-
-	// sort.Ints(seatIDS)
-	// fmt.Println(seatIDS)
-
-	// for i, val := range seatIDS {
-	// 	if i < len(emptySeats)-2 {
-	// 		if seatIDS[i+1]-val == 2 {
-	// 			fmt.Println(seatIDS[i+1], val)
-	// 		}
-	// 	}
-	// }
+	fmt.Println("Has to be one of these values", followsRule)
 }
