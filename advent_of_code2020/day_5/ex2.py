@@ -29,4 +29,4 @@ for sid in all_seat_ids:
     if sid not in list_seats:
         missing_seats.append(sid)
 
-breakpoint()
+# breakpoint()
